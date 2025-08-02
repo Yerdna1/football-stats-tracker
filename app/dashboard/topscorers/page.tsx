@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -91,8 +91,9 @@ export default function TopScorersPage() {
       );
       
       setTopScorers(response.response);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load top scorers');
+    } catch (err: unknown) {
+      const error = err as Error;
+      setError(error.message || 'Failed to load top scorers');
     } finally {
       setLoading(false);
     }
@@ -431,7 +432,7 @@ export default function TopScorersPage() {
               <div className="space-y-2">
                 <h3 className="text-xl font-semibold">No results found</h3>
                 <p className="text-muted-foreground max-w-md mx-auto">
-                  No top scorers were found for League ID "{leagueId}" in the {season} season. 
+                  No top scorers were found for League ID &quot;{leagueId}&quot; in the {season} season. 
                   Try a different league or season.
                 </p>
               </div>

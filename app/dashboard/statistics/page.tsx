@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { apiFootballService } from '@/lib/api-football/service';
 import { BarChart, PieChart, Activity, Target } from 'lucide-react';
+import Image from 'next/image';
 
 interface MatchStatistics {
   team: {
@@ -37,8 +38,9 @@ export default function StatisticsPage() {
       
       const response = await apiFootballService.getStatistics(parseInt(fixtureId));
       setStatistics(response.response);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load statistics');
+    } catch (err: unknown) {
+      const error = err as Error;
+      setError(error.message || 'Failed to load statistics');
     } finally {
       setLoading(false);
     }
@@ -65,7 +67,7 @@ export default function StatisticsPage() {
     return value.toString();
   };
 
-  const getStatColor = (value: number | string, type: string, isHome: boolean) => {
+  const getStatColor = (value: number | string, type: string) => {
     if (typeof value === 'string') return 'text-foreground';
     
     const lowerType = type.toLowerCase();
@@ -81,7 +83,7 @@ export default function StatisticsPage() {
     return 'text-red-600';
   };
 
-  const renderStatComparison = (homeStat: any, awayStat: any, type: string) => {
+  const renderStatComparison = (homeStat: { value: string | number } | null, awayStat: { value: string | number } | null, type: string) => {
     const homeValue = homeStat?.value || 0;
     const awayValue = awayStat?.value || 0;
     

@@ -46,7 +46,7 @@ export default function TeamsPage() {
     try {
       setLoading(true);
       setError('');
-      const params: any = {};
+      const params: Record<string, string> = {};
       
       if (country) params.country = country;
       if (name) params.search = name;
@@ -58,8 +58,9 @@ export default function TeamsPage() {
       // Extract unique countries
       const uniqueCountries = [...new Set(response.response.map((t: Team) => t.team.country))];
       setCountries(uniqueCountries.sort());
-    } catch (err: any) {
-      setError(err.message || 'Failed to load teams');
+    } catch (err: unknown) {
+      const error = err as Error;
+      setError(error.message || 'Failed to load teams');
     } finally {
       setLoading(false);
     }
@@ -219,7 +220,7 @@ export default function TeamsPage() {
       {/* Initial State */}
       {!loading && !hasSearched && (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">Enter search criteria and click "Search" to find teams.</p>
+          <p className="text-muted-foreground">Enter search criteria and click &quot;Search&quot; to find teams.</p>
         </div>
       )}
     </div>
