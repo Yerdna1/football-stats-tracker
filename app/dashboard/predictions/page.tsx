@@ -154,7 +154,7 @@ export default function PredictionsPage() {
       const response = await apiFootballService.getPredictions(parseInt(fixtureId));
       
       if (response.response.length > 0) {
-        setPrediction(response.response[0] as any);
+        setPrediction(response.response[0] as Prediction);
       } else {
         setError('No predictions available for this fixture');
       }

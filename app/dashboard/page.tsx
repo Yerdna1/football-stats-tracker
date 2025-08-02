@@ -6,7 +6,7 @@ import { getRecentApiCalls, getUsageStats } from '@/lib/firebase/firestore';
 import { useAuth } from '@/lib/firebase/auth-context';
 import { ensureFirestoreConnection } from '@/lib/firebase/config';
 import { Activity, BarChart3, Clock, TrendingUp } from 'lucide-react';
-import { ApiCall, UsageStats } from '@/types/api-response';
+import { ApiCall } from '@/types/api-response';
 
 export default function DashboardPage() {
   const { user } = useAuth();

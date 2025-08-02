@@ -69,7 +69,7 @@ export default function OddsPage() {
       }
       
       const response = await apiFootballService.getOdds(params);
-      setOdds(response.response as any);
+      setOdds(response.response as Odd[]);
     } catch (err: unknown) {
       const error = err as Error;
       setError(error.message || 'Failed to load odds');

@@ -86,7 +86,7 @@ export default function StandingsPage() {
       );
       
       if (response.response.length > 0) {
-        setStandings(response.response[0] as any);
+        setStandings(response.response[0] as League);
       } else {
         setError('No standings found for the specified league and season');
       }
