@@ -69,7 +69,26 @@ export default function OddsPage() {
       }
       
       const response = await apiFootballService.getOdds(params);
-      setOdds(response.response as Odd[]);
+      // Map the API response to match our local Odd interface
+      const mappedOdds: Odd[] = response.response.map((odd) => ({
+        league: {
+          id: odd.league.id,
+          name: odd.league.name,
+          country: odd.league.country.name,
+          logo: odd.league.logo,
+          flag: odd.league.country.flag || '',
+          season: odd.league.seasons?.[0]?.year || new Date().getFullYear()
+        },
+        fixture: {
+          id: odd.fixture.id,
+          timezone: odd.fixture.timezone,
+          date: odd.fixture.date,
+          timestamp: odd.fixture.timestamp
+        },
+        update: odd.update,
+        bookmakers: odd.bookmakers
+      }));
+      setOdds(mappedOdds);
     } catch (err: unknown) {
       const error = err as Error;
       setError(error.message || 'Failed to load odds');

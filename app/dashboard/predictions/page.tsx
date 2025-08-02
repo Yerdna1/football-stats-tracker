@@ -154,7 +154,62 @@ export default function PredictionsPage() {
       const response = await apiFootballService.getPredictions(parseInt(fixtureId));
       
       if (response.response.length > 0) {
-        setPrediction(response.response[0] as Prediction);
+        const apiPrediction = response.response[0];
+        // Map the API response to match our local Prediction interface
+        const mappedPrediction: Prediction = {
+          predictions: apiPrediction.predictions,
+          league: {
+            id: apiPrediction.league.id,
+            name: apiPrediction.league.name,
+            country: apiPrediction.league.country.name,
+            logo: apiPrediction.league.logo,
+            flag: apiPrediction.league.country.flag || '',
+            season: apiPrediction.league.seasons?.[0]?.year || new Date().getFullYear()
+          },
+          teams: {
+            home: {
+              id: apiPrediction.teams.home.id,
+              name: apiPrediction.teams.home.name,
+              logo: apiPrediction.teams.home.logo,
+              last_5: {
+                form: (apiPrediction.teams.home as any).last_5?.form || '',
+                att: (apiPrediction.teams.home as any).last_5?.att || '',
+                def: (apiPrediction.teams.home as any).last_5?.def || '',
+                goals: (apiPrediction.teams.home as any).last_5?.goals || {
+                  for: { total: 0, average: '0' },
+                  against: { total: 0, average: '0' }
+                }
+              }
+            },
+            away: {
+              id: apiPrediction.teams.away.id,
+              name: apiPrediction.teams.away.name,
+              logo: apiPrediction.teams.away.logo,
+              last_5: {
+                form: (apiPrediction.teams.away as any).last_5?.form || '',
+                att: (apiPrediction.teams.away as any).last_5?.att || '',
+                def: (apiPrediction.teams.away as any).last_5?.def || '',
+                goals: (apiPrediction.teams.away as any).last_5?.goals || {
+                  for: { total: 0, average: '0' },
+                  against: { total: 0, average: '0' }
+                }
+              }
+            }
+          },
+          comparison: apiPrediction.comparison,
+          h2h: apiPrediction.h2h.map((match: any) => ({
+            fixture: {
+              id: match.id,
+              referee: match.referee || '',
+              timezone: match.timezone,
+              date: match.date,
+              timestamp: match.timestamp
+            },
+            teams: match.teams,
+            goals: match.goals
+          }))
+        };
+        setPrediction(mappedPrediction);
       } else {
         setError('No predictions available for this fixture');
       }

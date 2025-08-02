@@ -86,7 +86,18 @@ export default function StandingsPage() {
       );
       
       if (response.response.length > 0) {
-        setStandings(response.response[0] as League);
+        // The API returns Standing[][] but we need to construct a League object
+        // Since we don't have league info in the standings response, we'll create a mock league object
+        const leagueData: League = {
+          id: parseInt(leagueId),
+          name: 'League', // We don't have the actual name from the standings API
+          country: '', // We don't have the country from the standings API
+          logo: '', // We don't have the logo from the standings API
+          flag: '', // We don't have the flag from the standings API
+          season: parseInt(season),
+          standings: response.response
+        };
+        setStandings(leagueData);
       } else {
         setError('No standings found for the specified league and season');
       }
