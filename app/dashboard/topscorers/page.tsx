@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { apiFootballService } from '@/lib/api-football/service';
 import { Trophy, Target, Timer, Star } from 'lucide-react';
+import Image from 'next/image';
 
 interface TopScorer {
   player: {
@@ -322,9 +323,11 @@ export default function TopScorersPage() {
 
                     {/* Player Photo */}
                     {scorer.player.photo && (
-                      <img
+                      <Image
                         src={scorer.player.photo}
                         alt={scorer.player.name}
+                        width={64}
+                        height={64}
                         className="w-16 h-16 rounded-full object-cover"
                       />
                     )}
@@ -334,9 +337,11 @@ export default function TopScorersPage() {
                       <div className="flex items-center gap-3 mb-2">
                         <h3 className="text-xl font-bold">{scorer.player.name}</h3>
                         {stats?.team?.logo && (
-                          <img 
+                          <Image 
                             src={stats.team.logo} 
                             alt={stats.team.name}
+                            width={32}
+                            height={32}
                             className="w-8 h-8 object-contain"
                           />
                         )}

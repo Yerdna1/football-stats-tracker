@@ -196,9 +196,11 @@ export default function StatisticsPage() {
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-3">
                 {statistics[0].team.logo && (
-                  <img 
+                  <Image 
                     src={statistics[0].team.logo} 
                     alt={statistics[0].team.name}
+                    width={32}
+                    height={32}
                     className="w-8 h-8 object-contain"
                   />
                 )}
@@ -208,9 +210,11 @@ export default function StatisticsPage() {
               <div className="flex items-center gap-3">
                 <span className="font-semibold">{statistics[1].team.name}</span>
                 {statistics[1].team.logo && (
-                  <img 
+                  <Image 
                     src={statistics[1].team.logo} 
                     alt={statistics[1].team.name}
+                    width={32}
+                    height={32}
                     className="w-8 h-8 object-contain"
                   />
                 )}
@@ -241,9 +245,11 @@ export default function StatisticsPage() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       {teamStats.team.logo && (
-                        <img 
+                        <Image 
                           src={teamStats.team.logo} 
                           alt={teamStats.team.name}
+                          width={24}
+                          height={24}
                           className="w-6 h-6 object-contain"
                         />
                       )}

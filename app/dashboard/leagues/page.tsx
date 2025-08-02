@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { apiFootballService } from '@/lib/api-football/service';
@@ -63,7 +63,7 @@ export default function LeaguesPage() {
     }
   };
 
-  const filterLeagues = () => {
+  const filterLeagues = useCallback(() => {
     let filtered = leagues;
 
     if (searchTerm) {
@@ -79,7 +79,7 @@ export default function LeaguesPage() {
     }
 
     setFilteredLeagues(filtered);
-  };
+  }, [leagues, searchTerm, selectedCountry]);
 
   if (loading) {
     return (

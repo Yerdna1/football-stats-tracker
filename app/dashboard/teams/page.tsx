@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { apiFootballService } from '@/lib/api-football/service';
 import { Search, Users, MapPin, Calendar } from 'lucide-react';
+import Image from 'next/image';
 
 interface Team {
   team: {
@@ -40,7 +41,7 @@ export default function TeamsPage() {
 
   useEffect(() => {
     filterTeams();
-  }, [searchTerm, selectedCountry, teams]);
+  }, [searchTerm, selectedCountry, teams, filterTeams]);
 
   const loadTeams = async (country?: string, name?: string) => {
     try {
@@ -66,7 +67,7 @@ export default function TeamsPage() {
     }
   };
 
-  const filterTeams = () => {
+  const filterTeams = useCallback(() => {
     let filtered = teams;
 
     if (searchTerm) {
@@ -81,7 +82,7 @@ export default function TeamsPage() {
     }
 
     setFilteredTeams(filtered);
-  };
+  }, [teams, searchTerm, selectedCountry]);
 
   const handleSearch = () => {
     loadTeams(selectedCountry, searchTerm);
@@ -159,9 +160,11 @@ export default function TeamsPage() {
               <CardContent className="p-6">
                 <div className="flex items-start gap-4 mb-4">
                   {team.team.logo && (
-                    <img
+                    <Image
                       src={team.team.logo}
                       alt={`${team.team.name} logo`}
+                      width={64}
+                      height={64}
                       className="w-16 h-16 object-contain"
                     />
                   )}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getRecentApiCalls, getUsageStats } from '@/lib/firebase/firestore';
 import { useAuth } from '@/lib/firebase/auth-context';
@@ -30,7 +30,7 @@ export default function DashboardPage() {
     }
   }, [user, loadDashboardData]);
 
-  const loadDashboardData = async () => {
+  const loadDashboardData = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -70,7 +70,7 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   if (loading) {
     return (
