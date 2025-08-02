@@ -4,18 +4,22 @@
     "indexes": "firestore.indexes.json"
   },
   "hosting": {
-    "public": "out",
+    "public": ".next",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
     ],
     "cleanUrls": true,
-    "trailingSlash": false,
+    "trailingSlash": true,
     "rewrites": [
       {
         "source": "/api/**",
-        "destination": "/api/index.html"
+        "function": "api"
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
       }
     ],
     "headers": [
