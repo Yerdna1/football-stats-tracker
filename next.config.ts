@@ -9,6 +9,13 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   
+  // Configure for static export (Firebase Hosting)
+  output: 'export',
+  trailingSlash: true,
+  images: {
+    unoptimized: true,
+  },
+  
   // Configure webpack to avoid permission issues
   webpack: (config, { dev }) => {
     if (dev) {

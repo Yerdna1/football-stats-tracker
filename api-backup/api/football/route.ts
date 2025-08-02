@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getApiClient } from '@/lib/api-football/client';
 
+export const dynamic = 'force-static';
+export const revalidate = false;
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const endpoint = searchParams.get('endpoint');
