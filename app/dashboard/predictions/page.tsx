@@ -219,13 +219,11 @@ export default function PredictionsPage() {
           },
           comparison: apiPrediction.comparison,
           h2h: apiPrediction.h2h.map((match: H2HMatch) => ({
-            fixture: {
-              id: match.id,
-              referee: match.referee || '',
-              timezone: match.timezone,
-              date: match.date,
-              timestamp: match.timestamp
-            },
+            id: match.id,
+            referee: match.referee,
+            timezone: match.timezone,
+            date: match.date,
+            timestamp: match.timestamp,
             teams: match.teams,
             goals: match.goals
           }))

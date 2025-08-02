@@ -15,28 +15,51 @@ export default function TestApiPage() {
     setResult(null);
 
     try {
+      console.log('Testing API at:', window.location.origin + '/api/football?endpoint=timezone');
+      
       // Test the API directly
       const response = await fetch('/api/football?endpoint=timezone');
       const responseText = await response.text();
       
       console.log('Response status:', response.status);
-      console.log('Response headers:', response.headers);
-      console.log('Response text:', responseText);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+      console.log('Response text length:', responseText.length);
+      console.log('Response preview:', responseText.substring(0, 200));
 
       if (responseText.startsWith('<!DOCTYPE') || responseText.startsWith('<html')) {
-        setError('Received HTML instead of JSON. API route may not be configured correctly.');
-        setResult(responseText.substring(0, 500));
+        setError(`Received HTML instead of JSON (Status: ${response.status}). API route may not be configured correctly.`);
+        setResult({
+          type: 'HTML Response',
+          status: response.status,
+          headers: Object.fromEntries(response.headers.entries()),
+          preview: responseText.substring(0, 1000)
+        });
       } else {
         try {
           const data = JSON.parse(responseText);
-          setResult(data);
+          console.log('Successfully parsed JSON:', data);
+          setResult({
+            type: 'JSON Response',
+            status: response.status,
+            data: data
+          });
         } catch (e) {
-          setError('Failed to parse JSON response');
-          setResult(responseText);
+          setError(`Failed to parse JSON response: ${e instanceof Error ? e.message : 'Parse error'}`);
+          setResult({
+            type: 'Parse Error',
+            status: response.status,
+            rawResponse: responseText.substring(0, 1000),
+            parseError: e instanceof Error ? e.message : 'Unknown parse error'
+          });
         }
       }
     } catch (err) {
+      console.error('Fetch error:', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
+      setResult({
+        type: 'Network Error',
+        error: err instanceof Error ? err.message : 'Unknown error'
+      });
     } finally {
       setLoading(false);
     }

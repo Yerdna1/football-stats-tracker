@@ -268,6 +268,7 @@ export interface Odds {
 }
 
 class ApiFootballClient {
+  [x: string]: any;
   private client: AxiosInstance;
   private apiKey: string | null = null;
   private requestQueue: Array<() => Promise<unknown>> = [];

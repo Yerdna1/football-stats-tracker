@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { apiFootballClient } from '@/lib/api-football/client';
+import apiFootballClient from '@/lib/api-football/client';
 
 // Enhanced error logging utility
 function logError(context: string, error: unknown, additionalInfo?: Record<string, unknown>) {
