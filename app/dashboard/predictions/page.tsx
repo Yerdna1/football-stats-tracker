@@ -8,6 +8,51 @@ import { apiFootballService } from '@/lib/api-football/service';
 import { Brain, Target, AlertCircle, Star } from 'lucide-react';
 import Image from 'next/image';
 
+interface TeamWithStats {
+  id: number;
+  name: string;
+  logo: string;
+  last_5?: {
+    form: string;
+    att: string;
+    def: string;
+    goals: {
+      for: {
+        total: number;
+        average: string;
+      };
+      against: {
+        total: number;
+        average: string;
+      };
+    };
+  };
+}
+
+interface H2HMatch {
+  id: number;
+  referee?: string;
+  timezone: string;
+  date: string;
+  timestamp: number;
+  teams: {
+    home: {
+      id: number;
+      name: string;
+      logo: string;
+    };
+    away: {
+      id: number;
+      name: string;
+      logo: string;
+    };
+  };
+  goals: {
+    home: number;
+    away: number;
+  };
+}
+
 interface Prediction {
   predictions: {
     winner: {
@@ -108,31 +153,7 @@ interface Prediction {
       away: string;
     };
   };
-  h2h: Array<{
-    fixture: {
-      id: number;
-      referee: string;
-      timezone: string;
-      date: string;
-      timestamp: number;
-    };
-    teams: {
-      home: {
-        id: number;
-        name: string;
-        logo: string;
-      };
-      away: {
-        id: number;
-        name: string;
-        logo: string;
-      };
-    };
-    goals: {
-      home: number;
-      away: number;
-    };
-  }>;
+  h2h: H2HMatch[];
 }
 
 export default function PredictionsPage() {
@@ -172,10 +193,10 @@ export default function PredictionsPage() {
               name: apiPrediction.teams.home.name,
               logo: apiPrediction.teams.home.logo,
               last_5: {
-                form: (apiPrediction.teams.home as any).last_5?.form || '',
-                att: (apiPrediction.teams.home as any).last_5?.att || '',
-                def: (apiPrediction.teams.home as any).last_5?.def || '',
-                goals: (apiPrediction.teams.home as any).last_5?.goals || {
+                form: (apiPrediction.teams.home as TeamWithStats).last_5?.form || '',
+                att: (apiPrediction.teams.home as TeamWithStats).last_5?.att || '',
+                def: (apiPrediction.teams.home as TeamWithStats).last_5?.def || '',
+                goals: (apiPrediction.teams.home as TeamWithStats).last_5?.goals || {
                   for: { total: 0, average: '0' },
                   against: { total: 0, average: '0' }
                 }
@@ -186,10 +207,10 @@ export default function PredictionsPage() {
               name: apiPrediction.teams.away.name,
               logo: apiPrediction.teams.away.logo,
               last_5: {
-                form: (apiPrediction.teams.away as any).last_5?.form || '',
-                att: (apiPrediction.teams.away as any).last_5?.att || '',
-                def: (apiPrediction.teams.away as any).last_5?.def || '',
-                goals: (apiPrediction.teams.away as any).last_5?.goals || {
+                form: (apiPrediction.teams.away as TeamWithStats).last_5?.form || '',
+                att: (apiPrediction.teams.away as TeamWithStats).last_5?.att || '',
+                def: (apiPrediction.teams.away as TeamWithStats).last_5?.def || '',
+                goals: (apiPrediction.teams.away as TeamWithStats).last_5?.goals || {
                   for: { total: 0, average: '0' },
                   against: { total: 0, average: '0' }
                 }
@@ -197,7 +218,7 @@ export default function PredictionsPage() {
             }
           },
           comparison: apiPrediction.comparison,
-          h2h: apiPrediction.h2h.map((match: any) => ({
+          h2h: apiPrediction.h2h.map((match: H2HMatch) => ({
             fixture: {
               id: match.id,
               referee: match.referee || '',

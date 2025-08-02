@@ -22,10 +22,16 @@ export const createUserProfile = async (userProfile: UserProfile) => {
   const userRef = doc(db, 'users', userProfile.uid);
   
   // Clean the profile data to remove undefined values
-  const cleanProfile: any = {
+  const cleanProfile: {
+    uid: string;
+    email: string;
+    createdAt: Timestamp;
+    plan: string;
+    displayName?: string;
+  } = {
     uid: userProfile.uid,
     email: userProfile.email,
-    createdAt: userProfile.createdAt instanceof Date ? Timestamp.fromDate(userProfile.createdAt) : userProfile.createdAt,
+    createdAt: userProfile.createdAt instanceof Date ? Timestamp.fromDate(userProfile.createdAt) : userProfile.createdAt as Timestamp,
     plan: userProfile.plan,
   };
   
@@ -128,7 +134,7 @@ export const updateUsageStats = async (apiCall: Omit<ApiCall, 'id'>) => {
   
   if (statsDoc.exists()) {
     // Update existing stats
-    const updates: { [key: string]: any } = {
+    const updates: { [key: string]: FieldValue | Partial<unknown> | undefined } = {
       totalCalls: increment(1),
       [`byEndpoint.${apiCall.endpoint}`]: increment(1),
       totalResponseSize: increment(apiCall.responseSize),
@@ -138,7 +144,7 @@ export const updateUsageStats = async (apiCall: Omit<ApiCall, 'id'>) => {
       updates.errors = increment(1);
     }
     
-    await updateDoc(statsRef, updates as { [x: string]: FieldValue | Partial<unknown> | undefined });
+    await updateDoc(statsRef, updates);
     
     // Update average response time
     const currentStats = statsDoc.data() as UsageStats;

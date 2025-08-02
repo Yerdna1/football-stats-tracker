@@ -11,7 +11,7 @@ export const cleanupUserProfile = async (userId: string) => {
     
     if (userSnap.exists()) {
       const data = userSnap.data();
-      const updates: { [key: string]: any } = {};
+      const updates: { [key: string]: FieldValue | Partial<unknown> | undefined } = {};
       
       // Remove undefined displayName field if it exists and is empty/undefined
       if (data.displayName === undefined || data.displayName === null || data.displayName === '') {
@@ -20,7 +20,7 @@ export const cleanupUserProfile = async (userId: string) => {
       
       // Apply updates if needed
       if (Object.keys(updates).length > 0) {
-        await updateDoc(userRef, updates as { [x: string]: FieldValue | Partial<unknown> | undefined });
+        await updateDoc(userRef, updates);
         console.log(`Cleaned up user profile for ${userId}`);
         return true;
       } else {
@@ -44,7 +44,7 @@ export const recreateUserProfile = async (userId: string, email: string, display
   try {
     const userRef = doc(db, 'users', userId);
     
-    const cleanProfile: { [key: string]: any } = {
+    const cleanProfile: { [key: string]: string | Date } = {
       uid: userId,
       email: email,
       createdAt: new Date(),
@@ -56,7 +56,7 @@ export const recreateUserProfile = async (userId: string, email: string, display
       cleanProfile.displayName = displayName.trim();
     }
     
-    await updateDoc(userRef, cleanProfile as { [x: string]: FieldValue | Partial<unknown> | undefined });
+    await updateDoc(userRef, cleanProfile);
     console.log(`Recreated clean user profile for ${userId}`);
     return true;
   } catch (error) {
