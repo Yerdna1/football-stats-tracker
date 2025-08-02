@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 export default function StyleTest() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
@@ -34,9 +36,9 @@ export default function StyleTest() {
               Hover me!
             </button>
             
-            <a href="/" className="text-indigo-600 hover:text-indigo-800 font-medium">
+            <Link href="/" className="text-indigo-600 hover:text-indigo-800 font-medium">
               ← Back to App
-            </a>
+            </Link>
           </div>
         </div>
         

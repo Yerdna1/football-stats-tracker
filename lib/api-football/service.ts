@@ -1,9 +1,9 @@
-import { ApiFootballResponse } from './client';
+import { ApiFootballResponse, Country, League, Team, Standing, Fixture, Player, Statistic, Prediction, Odds } from './client';
 
 class ApiFootballService {
   private baseUrl = '/api/football';
 
-  private async fetchApi<T>(endpoint: string, params?: Record<string, any>): Promise<ApiFootballResponse<T>> {
+  private async fetchApi<T>(endpoint: string, params?: Record<string, unknown>): Promise<ApiFootballResponse<T>> {
     const searchParams = new URLSearchParams({
       endpoint,
       ...params,
@@ -24,7 +24,7 @@ class ApiFootballService {
   }
 
   async getCountries() {
-    return this.fetchApi<any[]>('countries');
+    return this.fetchApi<Country[]>('countries');
   }
 
   async getLeagues(params?: {
@@ -33,7 +33,7 @@ class ApiFootballService {
     country?: string;
     season?: number;
   }) {
-    return this.fetchApi<any[]>('leagues', params);
+    return this.fetchApi<League[]>('leagues', params);
   }
 
   async getTeams(params?: {
@@ -42,11 +42,11 @@ class ApiFootballService {
     league?: number;
     season?: number;
   }) {
-    return this.fetchApi<any[]>('teams', params);
+    return this.fetchApi<Team[]>('teams', params);
   }
 
   async getStandings(league: number, season: number) {
-    return this.fetchApi<any[]>('standings', { league, season });
+    return this.fetchApi<Standing[][]>('standings', { league, season });
   }
 
   async getFixtures(params?: {
@@ -56,7 +56,7 @@ class ApiFootballService {
     team?: number;
     live?: string;
   }) {
-    return this.fetchApi<any[]>('fixtures', params);
+    return this.fetchApi<Fixture[]>('fixtures', params);
   }
 
   async getPlayers(params?: {
@@ -65,19 +65,19 @@ class ApiFootballService {
     season?: number;
     search?: string;
   }) {
-    return this.fetchApi<any[]>('players', params);
+    return this.fetchApi<Player[]>('players', params);
   }
 
   async getTopScorers(league: number, season: number) {
-    return this.fetchApi<any[]>('topscorers', { league, season });
+    return this.fetchApi<Player[]>('topscorers', { league, season });
   }
 
   async getStatistics(fixture: number) {
-    return this.fetchApi<any[]>('statistics', { fixture });
+    return this.fetchApi<Statistic[]>('statistics', { fixture });
   }
 
   async getPredictions(fixture: number) {
-    return this.fetchApi<any>('predictions', { fixture });
+    return this.fetchApi<Prediction[]>('predictions', { fixture });
   }
 
   async getOdds(params?: {
@@ -85,7 +85,7 @@ class ApiFootballService {
     league?: number;
     season?: number;
   }) {
-    return this.fetchApi<any[]>('odds', params);
+    return this.fetchApi<Odds[]>('odds', params);
   }
 }
 

@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { apiFootballService } from '@/lib/api-football/service';
-import { Search, Filter } from 'lucide-react';
+import { Search } from 'lucide-react';
+import Image from 'next/image';
 
 interface League {
   league: {
@@ -42,7 +42,7 @@ export default function LeaguesPage() {
 
   useEffect(() => {
     filterLeagues();
-  }, [searchTerm, selectedCountry, leagues]);
+  }, [searchTerm, selectedCountry, leagues, filterLeagues]);
 
   const loadLeagues = async () => {
     try {
@@ -55,8 +55,9 @@ export default function LeaguesPage() {
       setCountries(uniqueCountries.sort());
       
       setFilteredLeagues(response.response);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load leagues');
+    } catch (err: unknown) {
+      const error = err as Error;
+      setError(error.message || 'Failed to load leagues');
     } finally {
       setLoading(false);
     }
@@ -138,20 +139,24 @@ export default function LeaguesPage() {
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
                 {league.league.logo && (
-                  <img
+                  <Image
                     src={league.league.logo}
                     alt={`${league.league.name} logo`}
                     className="w-16 h-16 object-contain"
+                    width={64}
+                    height={64}
                   />
                 )}
                 <div className="flex-1">
                   <h3 className="font-semibold text-lg">{league.league.name}</h3>
                   <div className="flex items-center gap-2 mt-1">
                     {league.country.flag && (
-                      <img
+                      <Image
                         src={league.country.flag}
                         alt={`${league.country.name} flag`}
                         className="w-5 h-3 object-cover"
+                        width={20}
+                        height={12}
                       />
                     )}
                     <p className="text-sm text-muted-foreground">{league.country.name}</p>

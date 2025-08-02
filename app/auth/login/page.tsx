@@ -26,8 +26,8 @@ export default function LoginPage() {
     try {
       await signIn(email, password);
       router.push('/dashboard');
-    } catch (err: any) {
-      setError(err.message || 'Failed to sign in');
+    } catch (err: unknown) {
+      setError((err as Error).message || 'Failed to sign in');
     } finally {
       setLoading(false);
     }
@@ -40,8 +40,8 @@ export default function LoginPage() {
     try {
       await signInWithGoogle();
       router.push('/dashboard');
-    } catch (err: any) {
-      setError(err.message || 'Failed to sign in with Google');
+    } catch (err: unknown) {
+      setError((err as Error).message || 'Failed to sign in with Google');
     } finally {
       setLoading(false);
     }
@@ -108,7 +108,7 @@ export default function LoginPage() {
             Sign in with Google
           </Button>
           <p className="text-center text-sm text-muted-foreground mt-4">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link href="/auth/register" className="text-primary hover:underline">
               Sign up
             </Link>

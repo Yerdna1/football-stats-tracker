@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Activity, Moon, Sun, Check, X } from 'lucide-react';
+import { Activity, Moon, Sun, Check } from 'lucide-react';
 
 export default function CSSTest() {
   const [isDark, setIsDark] = useState(false);
@@ -230,7 +231,7 @@ export default function CSSTest() {
           {/* Back to App */}
           <div className="text-center">
             <Button asChild>
-              <a href="/">← Back to Football Stats App</a>
+              <Link href="/">← Back to Football Stats App</Link>
             </Button>
           </div>
         </div>

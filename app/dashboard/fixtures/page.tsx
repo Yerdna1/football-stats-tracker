@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { apiFootballService } from '@/lib/api-football/service';
 import { Calendar, Clock, MapPin, Trophy } from 'lucide-react';
+import Image from 'next/image';
 
 interface Fixture {
   fixture: {
@@ -91,7 +92,7 @@ export default function FixturesPage() {
     try {
       setLoading(true);
       setError('');
-      const params: any = {};
+      const params: Record<string, string> = {};
       
       if (live) {
         params.live = 'all';
@@ -101,8 +102,9 @@ export default function FixturesPage() {
       
       const response = await apiFootballService.getFixtures(params);
       setFixtures(response.response);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load fixtures');
+    } catch (err: unknown) {
+      const error = err as Error;
+      setError(error.message || 'Failed to load fixtures');
     } finally {
       setLoading(false);
     }
@@ -217,7 +219,13 @@ export default function FixturesPage() {
                     <Trophy className="h-4 w-4 text-muted-foreground" />
                     <span className="font-medium">{fixture.league.name}</span>
                     {fixture.league.flag && (
-                      <img src={fixture.league.flag} alt="Country" className="w-4 h-3" />
+                      <Image 
+                        src={fixture.league.flag} 
+                        alt="Country" 
+                        className="w-4 h-3" 
+                        width={16}
+                        height={12}
+                      />
                     )}
                   </div>
                   <div className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(fixture.fixture.status.short)}`}>
@@ -230,10 +238,12 @@ export default function FixturesPage() {
                   {/* Home Team */}
                   <div className="flex items-center gap-3">
                     {fixture.teams.home.logo && (
-                      <img 
+                      <Image 
                         src={fixture.teams.home.logo} 
                         alt={fixture.teams.home.name}
                         className="w-8 h-8 object-contain"
+                        width={32}
+                        height={32}
                       />
                     )}
                     <span className={`font-medium ${fixture.teams.home.winner ? 'text-green-600' : ''}`}>
@@ -265,10 +275,12 @@ export default function FixturesPage() {
                       {fixture.teams.away.name}
                     </span>
                     {fixture.teams.away.logo && (
-                      <img 
+                      <Image 
                         src={fixture.teams.away.logo} 
                         alt={fixture.teams.away.name}
                         className="w-8 h-8 object-contain"
+                        width={32}
+                        height={32}
                       />
                     )}
                   </div>

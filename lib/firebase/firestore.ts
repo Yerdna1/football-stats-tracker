@@ -21,7 +21,7 @@ export const createUserProfile = async (userProfile: UserProfile) => {
   const userRef = doc(db, 'users', userProfile.uid);
   
   // Clean the profile data to remove undefined values
-  const cleanProfile: any = {
+  const cleanProfile: Partial<UserProfile> = {
     uid: userProfile.uid,
     email: userProfile.email,
     createdAt: Timestamp.fromDate(userProfile.createdAt),
@@ -127,7 +127,7 @@ export const updateUsageStats = async (apiCall: Omit<ApiCall, 'id'>) => {
   
   if (statsDoc.exists()) {
     // Update existing stats
-    const updates: any = {
+    const updates: Record<string, unknown> = {
       totalCalls: increment(1),
       [`byEndpoint.${apiCall.endpoint}`]: increment(1),
       totalResponseSize: increment(apiCall.responseSize),

@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import Image from 'next/image';
 import { RateLimitError } from '@/components/ui/rate-limit-error';
 import { apiFootballService } from '@/lib/api-football/service';
 import { Search } from 'lucide-react';
@@ -11,6 +12,10 @@ interface Country {
   name: string;
   code: string;
   flag: string;
+}
+
+interface ApiError extends Error {
+  isRateLimit?: boolean;
 }
 
 export default function CountriesPage() {
@@ -38,8 +43,8 @@ export default function CountriesPage() {
       const response = await apiFootballService.getCountries();
       setCountries(response.response);
       setFilteredCountries(response.response);
-    } catch (err: any) {
-      setError(err);
+    } catch (err: unknown) {
+      setError(err as Error);
     } finally {
       setLoading(false);
     }
@@ -55,8 +60,8 @@ export default function CountriesPage() {
 
   if (error) {
     // Check if it's a rate limit error
-    if ((error as any).isRateLimit) {
-      return <RateLimitError error={error as any} onRetry={loadCountries} />;
+    if ((error as ApiError).isRateLimit) {
+      return <RateLimitError error={error} onRetry={loadCountries} />;
     }
     
     return (
@@ -96,9 +101,11 @@ export default function CountriesPage() {
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
                 {country.flag && (
-                  <img
+                  <Image
                     src={country.flag}
                     alt={`${country.name} flag`}
+                    width={48}
+                    height={32}
                     className="w-12 h-8 object-cover rounded"
                   />
                 )}
@@ -114,7 +121,7 @@ export default function CountriesPage() {
 
       {filteredCountries.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">No countries found matching "{searchTerm}"</p>
+          <p className="text-muted-foreground">No countries found matching &quot;{searchTerm}&quot;</p>
         </div>
       )}
     </div>

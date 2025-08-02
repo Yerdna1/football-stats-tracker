@@ -1,13 +1,13 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
 import { recordApiCall, getCachedResponse, cacheApiResponse } from '@/lib/firebase/firestore';
 import { auth } from '@/lib/firebase/config';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_FOOTBALL_BASE_URL || 'https://v3.football.api-sports.io';
 
-export interface ApiFootballResponse<T = any> {
+export interface ApiFootballResponse<T = unknown> {
   get: string;
-  parameters: Record<string, any>;
-  errors: any[];
+  parameters: Record<string, unknown>;
+  errors: string[];
   results: number;
   paging: {
     current: number;
@@ -16,10 +16,261 @@ export interface ApiFootballResponse<T = any> {
   response: T;
 }
 
+// API Football Types
+export interface Country {
+  name: string;
+  code: string;
+  flag: string;
+}
+
+export interface League {
+  id: number;
+  name: string;
+  type: string;
+  logo: string;
+  country: Country;
+  seasons: Season[];
+}
+
+export interface Season {
+  year: number;
+  start: string;
+  end: string;
+  current: boolean;
+  coverage: {
+    fixtures: {
+      events: boolean;
+      lineups: boolean;
+      statistics_fixtures: boolean;
+      statistics_players: boolean;
+    };
+    standings: boolean;
+    players: boolean;
+    top_scorers: boolean;
+    top_assists: boolean;
+    top_cards: boolean;
+    injuries: boolean;
+    predictions: boolean;
+    odds: boolean;
+  };
+}
+
+export interface Team {
+  id: number;
+  name: string;
+  code: string;
+  country: string;
+  founded: number;
+  national: boolean;
+  logo: string;
+  venue: {
+    id: number;
+    name: string;
+    address: string;
+    city: string;
+    capacity: number;
+    surface: string;
+    image: string;
+  };
+}
+
+export interface Fixture {
+  id: number;
+  referee: string;
+  timezone: string;
+  date: string;
+  timestamp: number;
+  periods: {
+    first: number;
+    second: number;
+  };
+  venue: {
+    id: number;
+    name: string;
+    city: string;
+  };
+  status: {
+    long: string;
+    short: string;
+    elapsed: number;
+  };
+  league: League;
+  teams: {
+    home: Team;
+    away: Team;
+  };
+  goals: {
+    home: number;
+    away: number;
+  };
+  score: {
+    halftime: {
+      home: number;
+      away: number;
+    };
+    fulltime: {
+      home: number;
+      away: number;
+    };
+    extratime: {
+      home: number;
+      away: number;
+    };
+    penalty: {
+      home: number;
+      away: number;
+    };
+  };
+}
+
+export interface Player {
+  id: number;
+  name: string;
+  firstname: string;
+  lastname: string;
+  age: number;
+  birth: {
+    date: string;
+    place: string;
+    country: string;
+  };
+  nationality: string;
+  height: string;
+  weight: string;
+  injured: boolean;
+  photo: string;
+}
+
+export interface Standing {
+  rank: number;
+  team: Team;
+  points: number;
+  goalsDiff: number;
+  group: string;
+  form: string;
+  status: string;
+  description: string;
+  all: {
+    played: number;
+    win: number;
+    draw: number;
+    lose: number;
+    goals: {
+      for: number;
+      against: number;
+    };
+  };
+  home: {
+    played: number;
+    win: number;
+    draw: number;
+    lose: number;
+    goals: {
+      for: number;
+      against: number;
+    };
+  };
+  away: {
+    played: number;
+    win: number;
+    draw: number;
+    lose: number;
+    goals: {
+      for: number;
+      against: number;
+    };
+  };
+  update: string;
+}
+
+export interface Statistic {
+  team: Team;
+  statistics: Array<{
+    type: string;
+    value: string | number;
+  }>;
+}
+
+export interface Prediction {
+  predictions: {
+    winner: {
+      id: number;
+      name: string;
+      comment: string;
+    };
+    win_or_draw: boolean;
+    under_over: string;
+    goals: {
+      home: string;
+      away: string;
+    };
+    advice: string;
+    percent: {
+      home: string;
+      draw: string;
+      away: string;
+    };
+  };
+  league: League;
+  teams: {
+    home: Team;
+    away: Team;
+  };
+  comparison: {
+    form: {
+      home: string;
+      away: string;
+    };
+    att: {
+      home: string;
+      away: string;
+    };
+    def: {
+      home: string;
+      away: string;
+    };
+    poisson_distribution: {
+      home: string;
+      away: string;
+    };
+    h2h: {
+      home: string;
+      away: string;
+    };
+    goals: {
+      home: string;
+      away: string;
+    };
+    total: {
+      home: string;
+      away: string;
+    };
+  };
+  h2h: Fixture[];
+}
+
+export interface Odds {
+  league: League;
+  fixture: Fixture;
+  update: string;
+  bookmakers: Array<{
+    id: number;
+    name: string;
+    bets: Array<{
+      id: number;
+      name: string;
+      values: Array<{
+        value: string;
+        odd: string;
+      }>;
+    }>;
+  }>;
+}
+
 class ApiFootballClient {
   private client: AxiosInstance;
   private apiKey: string | null = null;
-  private requestQueue: Array<() => Promise<any>> = [];
+  private requestQueue: Array<() => Promise<unknown>> = [];
   private isProcessingQueue = false;
   private lastRequestTime = 0;
   private minRequestInterval = 1000; // 1 second between requests
@@ -89,8 +340,9 @@ class ApiFootballClient {
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
         return await requestFn();
-      } catch (error: any) {
-        if (error.response?.status === 429 && attempt < maxRetries) {
+      } catch (error: unknown) {
+        const axiosError = error as { response?: { status: number } };
+        if (axiosError.response?.status === 429 && attempt < maxRetries) {
           // Rate limited - wait with exponential backoff
           const delay = baseDelay * Math.pow(2, attempt);
           console.warn(`Rate limited, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries + 1})`);
@@ -108,7 +360,7 @@ class ApiFootballClient {
     this.client.interceptors.request.use(
       async (config: InternalAxiosRequestConfig) => {
         const startTime = Date.now();
-        (config as any).metadata = { startTime };
+        (config as AxiosRequestConfig & { metadata?: { startTime: number } }).metadata = { startTime };
 
         // Add API key to headers
         if (this.apiKey) {
@@ -142,7 +394,7 @@ class ApiFootballClient {
     this.client.interceptors.response.use(
       async (response) => {
         const endTime = Date.now();
-        const startTime = (response.config as any).metadata?.startTime || endTime;
+        const startTime = (response.config as AxiosRequestConfig & { metadata?: { startTime: number } }).metadata?.startTime || endTime;
         const responseTime = endTime - startTime;
 
         // Track API call if user is authenticated
@@ -216,14 +468,14 @@ class ApiFootballClient {
           const rateLimitError = new Error(
             `API rate limit exceeded. Too many requests. Please wait ${Math.ceil(delay / 1000)} seconds before trying again.`
           );
-          (rateLimitError as any).isRateLimit = true;
-          (rateLimitError as any).retryAfter = delay;
+          (rateLimitError as Error & { isRateLimit?: boolean; retryAfter?: number }).isRateLimit = true;
+          (rateLimitError as Error & { isRateLimit?: boolean; retryAfter?: number }).retryAfter = delay;
           
           // Track the rate limit error
           const user = auth.currentUser;
           if (user) {
             const endpoint = this.getEndpointName(error.config);
-            const responseTime = Date.now() - ((error.config as any).metadata?.startTime || Date.now());
+            const responseTime = Date.now() - ((error.config as AxiosRequestConfig & { metadata?: { startTime: number } }).metadata?.startTime || Date.now());
 
             await recordApiCall({
               userId: user.uid,
@@ -243,7 +495,7 @@ class ApiFootballClient {
         const user = auth.currentUser;
         if (user && error.response) {
           const endpoint = this.getEndpointName(error.config);
-          const responseTime = Date.now() - ((error.config as any).metadata?.startTime || Date.now());
+          const responseTime = Date.now() - ((error.config as AxiosRequestConfig & { metadata?: { startTime: number } }).metadata?.startTime || Date.now());
 
           await recordApiCall({
             userId: user.uid,
@@ -283,7 +535,7 @@ class ApiFootballClient {
     );
   }
 
-  async getCountries(): Promise<ApiFootballResponse<any[]>> {
+  async getCountries(): Promise<ApiFootballResponse<Country[]>> {
     return this.queueRequest(() => 
       this.retryWithBackoff(async () => {
         const response = await this.client.get('/countries');
@@ -303,7 +555,7 @@ class ApiFootballClient {
     current?: boolean;
     search?: string;
     last?: number;
-  }): Promise<ApiFootballResponse<any[]>> {
+  }): Promise<ApiFootballResponse<League[]>> {
     return this.queueRequest(() => 
       this.retryWithBackoff(async () => {
         const response = await this.client.get('/leagues', { params });
@@ -321,7 +573,7 @@ class ApiFootballClient {
     code?: string;
     venue?: number;
     search?: string;
-  }): Promise<ApiFootballResponse<any[]>> {
+  }): Promise<ApiFootballResponse<Team[]>> {
     return this.queueRequest(() => 
       this.retryWithBackoff(async () => {
         const response = await this.client.get('/teams', { params });
@@ -334,7 +586,7 @@ class ApiFootballClient {
     league: number;
     season: number;
     team?: number;
-  }): Promise<ApiFootballResponse<any[]>> {
+  }): Promise<ApiFootballResponse<Standing[][]>> {
     return this.queueRequest(() => 
       this.retryWithBackoff(async () => {
         const response = await this.client.get('/standings', { params });
@@ -359,7 +611,7 @@ class ApiFootballClient {
     status?: string;
     venue?: number;
     timezone?: string;
-  }): Promise<ApiFootballResponse<any[]>> {
+  }): Promise<ApiFootballResponse<Fixture[]>> {
     return this.queueRequest(() => 
       this.retryWithBackoff(async () => {
         const response = await this.client.get('/fixtures', { params });
@@ -375,7 +627,7 @@ class ApiFootballClient {
     season?: number;
     search?: string;
     page?: number;
-  }): Promise<ApiFootballResponse<any[]>> {
+  }): Promise<ApiFootballResponse<Player[]>> {
     return this.queueRequest(() => 
       this.retryWithBackoff(async () => {
         const response = await this.client.get('/players', { params });
@@ -387,7 +639,7 @@ class ApiFootballClient {
   async getTopScorers(params: {
     league: number;
     season: number;
-  }): Promise<ApiFootballResponse<any[]>> {
+  }): Promise<ApiFootballResponse<Player[]>> {
     return this.queueRequest(() => 
       this.retryWithBackoff(async () => {
         const response = await this.client.get('/players/topscorers', { params });
@@ -400,7 +652,7 @@ class ApiFootballClient {
     fixture: number;
     team?: number;
     type?: string;
-  }): Promise<ApiFootballResponse<any[]>> {
+  }): Promise<ApiFootballResponse<Statistic[]>> {
     return this.queueRequest(() => 
       this.retryWithBackoff(async () => {
         const response = await this.client.get('/fixtures/statistics', { params });
@@ -411,7 +663,7 @@ class ApiFootballClient {
 
   async getPredictions(params: {
     fixture: number;
-  }): Promise<ApiFootballResponse<any>> {
+  }): Promise<ApiFootballResponse<Prediction[]>> {
     return this.queueRequest(() => 
       this.retryWithBackoff(async () => {
         const response = await this.client.get('/predictions', { params });
@@ -429,7 +681,7 @@ class ApiFootballClient {
     page?: number;
     bookmaker?: number;
     bet?: number;
-  }): Promise<ApiFootballResponse<any[]>> {
+  }): Promise<ApiFootballResponse<Odds[]>> {
     return this.queueRequest(() => 
       this.retryWithBackoff(async () => {
         const response = await this.client.get('/odds', { params });

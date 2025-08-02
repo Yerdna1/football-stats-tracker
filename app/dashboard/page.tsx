@@ -15,14 +15,20 @@ export default function DashboardPage() {
     errorRate: 0,
     mostUsedEndpoint: '',
   });
-  const [recentCalls, setRecentCalls] = useState<any[]>([]);
+  const [recentCalls, setRecentCalls] = useState<Array<{
+    id: string;
+    endpoint: string;
+    timestamp: Date;
+    status: number;
+    responseTime: number;
+  }>>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (user) {
       loadDashboardData();
     }
-  }, [user]);
+  }, [user, loadDashboardData]);
 
   const loadDashboardData = async () => {
     if (!user) return;

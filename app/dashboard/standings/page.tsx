@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { apiFootballService } from '@/lib/api-football/service';
-import { Trophy, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import Image from 'next/image';
 
 interface Standing {
   rank: number;
@@ -90,8 +90,9 @@ export default function StandingsPage() {
       } else {
         setError('No standings found for the specified league and season');
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to load standings');
+    } catch (err: unknown) {
+      const error = err as Error;
+      setError(error.message || 'Failed to load standings');
     } finally {
       setLoading(false);
     }
@@ -224,13 +225,13 @@ export default function StandingsPage() {
           <CardHeader>
             <div className="flex items-center gap-4">
               {standings.logo && (
-                <img src={standings.logo} alt={standings.name} className="w-12 h-12" />
+                <Image src={standings.logo} alt={standings.name} className="w-12 h-12" width={48} height={48} />
               )}
               <div>
                 <CardTitle className="flex items-center gap-2">
                   {standings.name}
                   {standings.flag && (
-                    <img src={standings.flag} alt={standings.country} className="w-6 h-4" />
+                    <Image src={standings.flag} alt={standings.country} className="w-6 h-4" width={24} height={16} />
                   )}
                 </CardTitle>
                 <CardDescription>
@@ -267,10 +268,12 @@ export default function StandingsPage() {
                       <td className="p-2">
                         <div className="flex items-center gap-3">
                           {team.team.logo && (
-                            <img 
+                            <Image 
                               src={team.team.logo} 
                               alt={team.team.name}
                               className="w-6 h-6 object-contain"
+                              width={24}
+                              height={24}
                             />
                           )}
                           <span className="font-medium">{team.team.name}</span>

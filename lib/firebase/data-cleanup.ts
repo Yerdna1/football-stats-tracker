@@ -11,7 +11,7 @@ export const cleanupUserProfile = async (userId: string) => {
     
     if (userSnap.exists()) {
       const data = userSnap.data();
-      const updates: any = {};
+      const updates: Record<string, unknown> = {};
       
       // Remove undefined displayName field if it exists and is empty/undefined
       if (data.displayName === undefined || data.displayName === null || data.displayName === '') {
@@ -44,7 +44,7 @@ export const recreateUserProfile = async (userId: string, email: string, display
   try {
     const userRef = doc(db, 'users', userId);
     
-    const cleanProfile: any = {
+    const cleanProfile: Record<string, unknown> = {
       uid: userId,
       email: email,
       createdAt: new Date(),

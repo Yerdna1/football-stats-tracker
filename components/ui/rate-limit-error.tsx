@@ -19,7 +19,7 @@ export function RateLimitError({ error, onRetry }: RateLimitErrorProps) {
           API Rate Limit Exceeded
         </CardTitle>
         <CardDescription className="text-orange-700 dark:text-orange-300">
-          You've made too many requests in a short period
+          You&apos;ve made too many requests in a short period
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

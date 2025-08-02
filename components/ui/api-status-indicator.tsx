@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { CheckCircle, AlertTriangle, Clock, Wifi } from 'lucide-react';
 
 interface ApiStatus {
@@ -10,10 +10,12 @@ interface ApiStatus {
 }
 
 export function ApiStatusIndicator() {
-  const [status, setStatus] = useState<ApiStatus>({ status: 'idle' });
+  const [status] = useState<ApiStatus>({ status: 'idle' });
 
   // This would be connected to your API client's status
   // For now, it's a placeholder component structure
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // const setStatus = useState<ApiStatus>({ status: 'idle' })[1];
 
   const getStatusIcon = () => {
     switch (status.status) {

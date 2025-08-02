@@ -5,7 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { apiFootballService } from '@/lib/api-football/service';
-import { Brain, Target, TrendingUp, AlertCircle, Star } from 'lucide-react';
+import { Brain, Target, AlertCircle, Star } from 'lucide-react';
+import Image from 'next/image';
 
 interface Prediction {
   predictions: {
@@ -157,8 +158,9 @@ export default function PredictionsPage() {
       } else {
         setError('No predictions available for this fixture');
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to load predictions');
+    } catch (err: unknown) {
+      const error = err as Error;
+      setError(error.message || 'Failed to load predictions');
     } finally {
       setLoading(false);
     }
@@ -267,10 +269,12 @@ export default function PredictionsPage() {
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                   {prediction.teams.home.logo && (
-                    <img 
+                    <Image 
                       src={prediction.teams.home.logo} 
                       alt={prediction.teams.home.name}
                       className="w-12 h-12 object-contain"
+                      width={48}
+                      height={48}
                     />
                   )}
                   <span className="text-xl font-bold">{prediction.teams.home.name}</span>
@@ -283,10 +287,12 @@ export default function PredictionsPage() {
                 <div className="flex items-center gap-3">
                   <span className="text-xl font-bold">{prediction.teams.away.name}</span>
                   {prediction.teams.away.logo && (
-                    <img 
+                    <Image 
                       src={prediction.teams.away.logo} 
                       alt={prediction.teams.away.name}
                       className="w-12 h-12 object-contain"
+                      width={48}
+                      height={48}
                     />
                   )}
                 </div>
@@ -348,10 +354,12 @@ export default function PredictionsPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   {prediction.teams.home.logo && (
-                    <img 
+                    <Image 
                       src={prediction.teams.home.logo} 
                       alt={prediction.teams.home.name}
                       className="w-6 h-6 object-contain"
+                      width={24}
+                      height={24}
                     />
                   )}
                   {prediction.teams.home.name} Form
@@ -399,10 +407,12 @@ export default function PredictionsPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   {prediction.teams.away.logo && (
-                    <img 
+                    <Image 
                       src={prediction.teams.away.logo} 
                       alt={prediction.teams.away.name}
                       className="w-6 h-6 object-contain"
+                      width={24}
+                      height={24}
                     />
                   )}
                   {prediction.teams.away.name} Form

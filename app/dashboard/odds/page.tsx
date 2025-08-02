@@ -8,10 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { apiFootballService } from '@/lib/api-football/service';
 import { Percent, TrendingUp, Target, Star, DollarSign } from 'lucide-react';
 
-interface Bookmaker {
-  id: number;
-  name: string;
-}
 
 interface Bet {
   id: number;
@@ -63,7 +59,7 @@ export default function OddsPage() {
       setLoading(true);
       setError('');
       
-      const params: any = {
+      const params: Record<string, number> = {
         fixture: parseInt(fixtureId),
         bet: parseInt(bet)
       };
@@ -74,8 +70,9 @@ export default function OddsPage() {
       
       const response = await apiFootballService.getOdds(params);
       setOdds(response.response);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load odds');
+    } catch (err: unknown) {
+      const error = err as Error;
+      setError(error.message || 'Failed to load odds');
     } finally {
       setLoading(false);
     }

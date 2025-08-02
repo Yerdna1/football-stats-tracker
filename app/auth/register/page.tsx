@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/firebase/auth-context';
-import { createUserProfile } from '@/lib/firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -39,8 +38,8 @@ export default function RegisterPage() {
     try {
       await signUp(email, password);
       router.push('/dashboard');
-    } catch (err: any) {
-      setError(err.message || 'Failed to create account');
+    } catch (err: unknown) {
+      setError((err as Error).message || 'Failed to create account');
     } finally {
       setLoading(false);
     }
@@ -53,8 +52,8 @@ export default function RegisterPage() {
     try {
       await signInWithGoogle();
       router.push('/dashboard');
-    } catch (err: any) {
-      setError(err.message || 'Failed to sign up with Google');
+    } catch (err: unknown) {
+      setError((err as Error).message || 'Failed to sign up with Google');
     } finally {
       setLoading(false);
     }

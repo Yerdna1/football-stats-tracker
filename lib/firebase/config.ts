@@ -1,6 +1,6 @@
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getAuth, Auth } from 'firebase/auth';
-import { getFirestore, Firestore, connectFirestoreEmulator, enableNetwork, disableNetwork, initializeFirestore } from 'firebase/firestore';
+import { getFirestore, Firestore, enableNetwork, disableNetwork, initializeFirestore } from 'firebase/firestore';
 import { getAnalytics, Analytics } from 'firebase/analytics';
 
 const firebaseConfig = {
@@ -40,7 +40,7 @@ if (typeof window !== 'undefined' && app) {
       ignoreUndefinedProperties: true,
       experimentalForceLongPolling: true, // Helps with static hosting
     });
-  } catch (error) {
+  } catch {
     // Fallback to default initialization if custom settings fail
     db = getFirestore(app);
   }

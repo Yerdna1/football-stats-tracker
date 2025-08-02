@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 export default function TestPage() {
   return (
     <div className="min-h-screen bg-red-500 p-8">
@@ -63,12 +65,12 @@ export default function TestPage() {
         </div>
         
         <div className="mt-8 text-center">
-          <a 
+          <Link 
             href="/"
             className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200"
           >
             ← Back to App
-          </a>
+          </Link>
         </div>
       </div>
     </div>

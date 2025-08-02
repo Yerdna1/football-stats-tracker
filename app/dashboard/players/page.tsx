@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { apiFootballService } from '@/lib/api-football/service';
-import { Search, User, Calendar, MapPin, Trophy } from 'lucide-react';
+import { Calendar, MapPin, Trophy } from 'lucide-react';
+import Image from 'next/image';
 
 interface Player {
   player: {
@@ -120,7 +121,7 @@ export default function PlayersPage() {
       setLoading(true);
       setError('');
       
-      const params: any = {};
+      const params: Record<string, string | number> = {};
       if (searchTerm) params.search = searchTerm;
       if (teamId) params.team = parseInt(teamId);
       if (leagueId) params.league = parseInt(leagueId);
@@ -128,8 +129,9 @@ export default function PlayersPage() {
       
       const response = await apiFootballService.getPlayers(params);
       setPlayers(response.response);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load players');
+    } catch (err: unknown) {
+      const error = err as Error;
+      setError(error.message || 'Failed to load players');
     } finally {
       setLoading(false);
     }
@@ -251,10 +253,12 @@ export default function PlayersPage() {
               <CardContent className="p-6">
                 <div className="flex items-start gap-4 mb-4">
                   {playerData.player.photo && (
-                    <img
+                    <Image
                       src={playerData.player.photo}
                       alt={playerData.player.name}
                       className="w-16 h-16 rounded-full object-cover"
+                      width={64}
+                      height={64}
                     />
                   )}
                   <div className="flex-1">
@@ -309,7 +313,7 @@ export default function PlayersPage() {
                         <div key={index} className="space-y-2">
                           <div className="flex items-center gap-2">
                             {stat.team.logo && (
-                              <img src={stat.team.logo} alt={stat.team.name} className="w-4 h-4" />
+                              <Image src={stat.team.logo} alt={stat.team.name} className="w-4 h-4" width={16} height={16} />
                             )}
                             <span className="font-medium text-sm">{stat.team.name}</span>
                             {stat.games.position && (
