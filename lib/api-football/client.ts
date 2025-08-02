@@ -689,6 +689,32 @@ class ApiFootballClient {
       })
     );
   }
+
+  // Generic request method for dynamic endpoints
+  async request<T = unknown>(endpoint: string, params?: Record<string, unknown>): Promise<ApiFootballResponse<T>> {
+    return this.queueRequest(() => 
+      this.retryWithBackoff(async () => {
+        // Map endpoint names to API paths
+        const endpointMap: Record<string, string> = {
+          'timezone': '/timezone',
+          'countries': '/countries',
+          'leagues': '/leagues',
+          'teams': '/teams',
+          'standings': '/standings',
+          'fixtures': '/fixtures',
+          'players': '/players',
+          'topscorers': '/players/topscorers',
+          'statistics': '/fixtures/statistics',
+          'predictions': '/predictions',
+          'odds': '/odds'
+        };
+
+        const apiPath = endpointMap[endpoint] || `/${endpoint}`;
+        const response = await this.client.get(apiPath, { params });
+        return response.data;
+      })
+    );
+  }
 }
 
 // Create singleton instance
