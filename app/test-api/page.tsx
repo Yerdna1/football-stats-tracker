@@ -4,8 +4,31 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
+type ApiTestResult = 
+  | {
+      type: 'HTML Response';
+      status: number;
+      headers: Record<string, string>;
+      preview: string;
+    }
+  | {
+      type: 'JSON Response';
+      status: number;
+      data: unknown;
+    }
+  | {
+      type: 'Parse Error';
+      status: number;
+      rawResponse: string;
+      parseError: string;
+    }
+  | {
+      type: 'Network Error';
+      error: string;
+    };
+
 export default function TestApiPage() {
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<ApiTestResult | null>(null);
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState(false);
 
