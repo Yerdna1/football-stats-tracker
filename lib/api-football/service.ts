@@ -4,19 +4,43 @@ class ApiFootballService {
   private baseUrl = '/api/football';
 
   private async fetchApi<T>(endpoint: string, params?: Record<string, unknown>): Promise<ApiFootballResponse<T>> {
-    const searchParams = new URLSearchParams({
-      endpoint,
-      ...params,
-    });
+    try {
+      const searchParams = new URLSearchParams({
+        endpoint,
+        ...params,
+      });
 
-    const response = await fetch(`${this.baseUrl}?${searchParams}`);
-    
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'API request failed');
+      console.log(`Fetching: ${this.baseUrl}?${searchParams}`);
+      
+      const response = await fetch(`${this.baseUrl}?${searchParams}`);
+      
+      // Get response text first to check if it's valid JSON
+      const responseText = await response.text();
+      
+      // Check if response is HTML (error page)
+      if (responseText.startsWith('<!DOCTYPE') || responseText.startsWith('<html')) {
+        console.error('Received HTML response instead of JSON:', responseText.substring(0, 200));
+        throw new Error('API returned HTML instead of JSON. This usually indicates a configuration or routing error.');
+      }
+      
+      // Try to parse as JSON
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('Failed to parse response as JSON:', responseText.substring(0, 200));
+        throw new Error('Invalid JSON response from API');
+      }
+      
+      if (!response.ok) {
+        throw new Error(data.error || data.message || `API request failed with status ${response.status}`);
+      }
+
+      return data;
+    } catch (error) {
+      console.error('API Service Error:', error);
+      throw error;
     }
-
-    return response.json();
   }
 
   async getTimezone() {
