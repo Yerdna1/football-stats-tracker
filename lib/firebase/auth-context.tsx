@@ -37,40 +37,55 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setUser(user);
-      
-      if (user) {
-        try {
-          // Ensure Firestore connection before making any calls
-          const connected = await ensureFirestoreConnection();
-          if (!connected) {
-            console.warn('Firestore connection failed, skipping profile creation');
-            setLoading(false);
-            return;
-          }
+    // Wrap auth state change in try-catch for static export compatibility
+    let unsubscribe: (() => void) | null = null;
+    
+    try {
+      unsubscribe = onAuthStateChanged(auth, async (user) => {
+        setUser(user);
+        
+        if (user) {
+          try {
+            // Only try Firestore operations in browser environment
+            if (typeof window !== 'undefined') {
+              // Ensure Firestore connection before making any calls
+              const connected = await ensureFirestoreConnection();
+              if (!connected) {
+                console.warn('Firestore connection failed, skipping profile creation');
+                setLoading(false);
+                return;
+              }
 
-          // Check if user profile exists, create if not
-          const profile = await getUserProfile(user.uid);
-          if (!profile) {
-            await createUserProfile({
-              uid: user.uid,
-              email: user.email!,
-              displayName: user.displayName || undefined,
-              createdAt: new Date(),
-              plan: 'free',
-            });
+              // Check if user profile exists, create if not
+              const profile = await getUserProfile(user.uid);
+              if (!profile) {
+                await createUserProfile({
+                  uid: user.uid,
+                  email: user.email!,
+                  displayName: user.displayName || undefined,
+                  createdAt: new Date(),
+                  plan: 'free',
+                });
+              }
+            }
+          } catch (error) {
+            console.error('Error creating/fetching user profile:', error);
+            // Don't block the auth flow if profile creation fails
           }
-        } catch (error) {
-          console.error('Error creating/fetching user profile:', error);
-          // Don't block the auth flow if profile creation fails
         }
-      }
-      
+        
+        setLoading(false);
+      });
+    } catch (error) {
+      console.error('Auth state change listener failed:', error);
       setLoading(false);
-    });
+    }
 
-    return unsubscribe;
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {

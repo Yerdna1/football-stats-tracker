@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AuthProvider } from "@/lib/firebase/auth-context";
 import { ThemeProvider } from "@/components/theme/theme-provider";
+import { FirebaseInit } from "@/components/firebase-init";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -35,6 +36,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <FirebaseInit />
           <AuthProvider>
             {children}
           </AuthProvider>
