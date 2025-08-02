@@ -106,13 +106,13 @@ export async function GET(request: NextRequest) {
     const duration = Date.now() - startTime; 
     
     console.log(`[${requestId}] API Response received:`, {
-      status: response && typeof response === 'object' && 'errors' in response && response.errors?.length ? 'Error' : 'Success',
+      status: response && typeof response === 'object' && 'errors' in response && Array.isArray(response.errors) && response.errors.length > 0 ? 'Error' : 'Success',
       duration: `${duration}ms`,
       hasData: response && typeof response === 'object' && 'response' in response ? !!response.response : false,
       timestamp: new Date().toISOString()
     });
     
-    if (response && typeof response === 'object' && 'errors' in response && response.errors && response.errors.length > 0) {
+    if (response && typeof response === 'object' && 'errors' in response && Array.isArray(response.errors) && response.errors.length > 0) {
       logError('API returned errors', null, { 
         requestId, 
         endpoint, 
@@ -123,7 +123,7 @@ export async function GET(request: NextRequest) {
       
       return NextResponse.json(
         { 
-          error: response.errors[0] || 'API request failed',
+          error: (Array.isArray(response.errors) && response.errors[0]) || 'API request failed',
           requestId,
           endpoint,
           details: response.errors
@@ -133,7 +133,7 @@ export async function GET(request: NextRequest) {
     }
 
     console.log(`[${requestId}] Request completed successfully in ${duration}ms`);
-    return NextResponse.json({ ...response, requestId });
+    return NextResponse.json({ ...(response as Record<string, unknown>), requestId });
     
   } catch (error) {
     logError('Unhandled API route error', error, { requestId });
