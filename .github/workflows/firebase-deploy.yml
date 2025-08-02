@@ -17,26 +17,46 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       
+    - name: Check for package-lock.json
+      run: |
+        if [ ! -f "package-lock.json" ]; then
+          echo "package-lock.json not found, creating one..."
+          npm install --package-lock-only
+        fi
+        
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '20'
-        cache: 'npm'
-        cache-dependency-path: 'package-lock.json'
         
-    - name: Cache node modules
+    - name: Cache dependencies
       uses: actions/cache@v3
       with:
-        path: ~/.npm
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        path: |
+          ~/.npm
+          node_modules
+        key: ${{ runner.os }}-node-20-${{ hashFiles('package-lock.json') }}
         restore-keys: |
+          ${{ runner.os }}-node-20-
           ${{ runner.os }}-node-
         
     - name: Install dependencies
-      run: npm ci --prefer-offline --no-audit
+      run: |
+        if [ ! -d "node_modules" ]; then
+          npm ci --prefer-offline --no-audit
+        else
+          echo "Dependencies already cached"
+        fi
       
     - name: Build application
-      run: npm run build
+      run: |
+        # Ensure we're not using static export for deployment
+        if grep -q 'output.*export' next.config.ts 2>/dev/null; then
+          echo "Removing static export configuration for Firebase deployment..."
+          sed -i 's/output.*export.*,//g' next.config.ts
+          sed -i 's/\/\/.*output.*export.*/\/\/ output: "export", \/\/ Disabled for Firebase deployment/g' next.config.ts
+        fi
+        npm run build
       env:
         NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
         NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
