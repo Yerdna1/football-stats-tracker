@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import apiFootballClient from '@/lib/api-football/client';
 
+// Configure for static export compatibility
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // Enhanced error logging utility
 function logError(context: string, error: unknown, additionalInfo?: Record<string, unknown>) {
   const timestamp = new Date().toISOString();

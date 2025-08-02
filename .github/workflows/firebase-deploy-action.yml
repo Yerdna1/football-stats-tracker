@@ -50,7 +50,11 @@ jobs:
       
     - name: Build application for static hosting
       run: |
-        # Enable static export for Firebase hosting deployment
+        # Remove API routes for static export
+        echo "Removing API routes for static export..."
+        rm -rf app/api
+        
+        # Enable static export for Firebase hosting deployment  
         if grep -q '\/\/.*output.*export' next.config.ts 2>/dev/null; then
           echo "Enabling static export configuration for Firebase deployment..."
           sed -i 's/\/\/.*output.*export.*/output: "export",/g' next.config.ts
@@ -69,6 +73,8 @@ jobs:
         NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
         NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
         NEXT_PUBLIC_API_FOOTBALL_BASE_URL: ${{ secrets.NEXT_PUBLIC_API_FOOTBALL_BASE_URL }}
+        NEXT_PUBLIC_API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+        NEXT_PUBLIC_STATIC_BUILD: 'true'
         
     - name: Deploy to Firebase Hosting
       uses: FirebaseExtended/action-hosting-deploy@v0

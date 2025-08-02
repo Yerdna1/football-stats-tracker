@@ -1,13 +1,29 @@
 import { ApiFootballResponse, Country, League, Team, Standing, Fixture, Player, Statistic, Prediction, Odds } from './client';
+import directApiFootballClient from './client-direct';
 
 class ApiFootballService {
   private baseUrl = '/api/football';
+  private isStaticBuild = process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_STATIC_BUILD === 'true';
 
   private async fetchApi<T>(endpoint: string, params?: Record<string, unknown>): Promise<ApiFootballResponse<T>> {
     const requestId = `${endpoint}-${Date.now()}`;
     const startTime = Date.now();
     
     try {
+      // For static builds, use direct API client
+      if (this.isStaticBuild) {
+        console.log(`[${requestId}] Service: Using direct API client for static build`);
+        
+        // Set API key for direct client
+        const apiKey = process.env.NEXT_PUBLIC_API_FOOTBALL_KEY;
+        if (apiKey) {
+          directApiFootballClient.setApiKey(apiKey);
+        }
+        
+        return await directApiFootballClient.request<T>(endpoint, params);
+      }
+
+      // For development/server builds, use API route
       const searchParams = new URLSearchParams({
         endpoint,
         ...params,
