@@ -101,11 +101,11 @@ export default function StatisticsPage() {
     return (
       <div className="space-y-2">
         <div className="flex justify-between items-center">
-          <span className={getStatColor(homeValue, type, true)}>
+          <span className={getStatColor(homeValue, type)}>
             {formatStatValue(homeValue, type)}
           </span>
           <span className="text-sm text-muted-foreground capitalize">{type}</span>
-          <span className={getStatColor(awayValue, type, false)}>
+          <span className={getStatColor(awayValue, type)}>
             {formatStatValue(awayValue, type)}
           </span>
         </div>

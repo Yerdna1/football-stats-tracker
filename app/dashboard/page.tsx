@@ -6,6 +6,7 @@ import { getRecentApiCalls, getUsageStats } from '@/lib/firebase/firestore';
 import { useAuth } from '@/lib/firebase/auth-context';
 import { ensureFirestoreConnection } from '@/lib/firebase/config';
 import { Activity, BarChart3, Clock, TrendingUp } from 'lucide-react';
+import { ApiCall, UsageStats } from '@/types/api-response';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -15,20 +16,8 @@ export default function DashboardPage() {
     errorRate: 0,
     mostUsedEndpoint: '',
   });
-  const [recentCalls, setRecentCalls] = useState<Array<{
-    id: string;
-    endpoint: string;
-    timestamp: Date;
-    status: number;
-    responseTime: number;
-  }>>([]);
+  const [recentCalls, setRecentCalls] = useState<ApiCall[]>([]);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (user) {
-      loadDashboardData();
-    }
-  }, [user, loadDashboardData]);
 
   const loadDashboardData = useCallback(async () => {
     if (!user) return;
@@ -71,6 +60,12 @@ export default function DashboardPage() {
       setLoading(false);
     }
   }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      loadDashboardData();
+    }
+  }, [user, loadDashboardData]);
 
   if (loading) {
     return (
@@ -191,7 +186,7 @@ export default function DashboardPage() {
                       {call.responseTime}ms
                     </span>
                     <span className="text-muted-foreground">
-                      {(call.responseSize / 1024).toFixed(1)}KB
+                      {call.responseSize ? (call.responseSize / 1024).toFixed(1) : '0'}KB
                     </span>
                   </div>
                 </div>

@@ -24,7 +24,7 @@ export const createUserProfile = async (userProfile: UserProfile) => {
   const cleanProfile: Partial<UserProfile> = {
     uid: userProfile.uid,
     email: userProfile.email,
-    createdAt: Timestamp.fromDate(userProfile.createdAt),
+    createdAt: userProfile.createdAt instanceof Date ? Timestamp.fromDate(userProfile.createdAt) : userProfile.createdAt as any,
     plan: userProfile.plan,
   };
   
@@ -137,7 +137,7 @@ export const updateUsageStats = async (apiCall: Omit<ApiCall, 'id'>) => {
       updates.errors = increment(1);
     }
     
-    await updateDoc(statsRef, updates);
+    await updateDoc(statsRef, updates as any);
     
     // Update average response time
     const currentStats = statsDoc.data() as UsageStats;

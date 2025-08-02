@@ -91,7 +91,7 @@ export default function TopScorersPage() {
         parseInt(season)
       );
       
-      setTopScorers(response.response);
+      setTopScorers(response.response as any);
     } catch (err: unknown) {
       const error = err as Error;
       setError(error.message || 'Failed to load top scorers');

@@ -4,28 +4,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { apiFootballService } from '@/lib/api-football/service';
+import { LeagueResponse as League } from '@/types/api-response';
 import { Search } from 'lucide-react';
 import Image from 'next/image';
-
-interface League {
-  league: {
-    id: number;
-    name: string;
-    type: string;
-    logo: string;
-  };
-  country: {
-    name: string;
-    code: string;
-    flag: string;
-  };
-  seasons: Array<{
-    year: number;
-    start: string;
-    end: string;
-    current: boolean;
-  }>;
-}
 
 export default function LeaguesPage() {
   const [leagues, setLeagues] = useState<League[]>([]);
@@ -35,33 +16,6 @@ export default function LeaguesPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCountry, setSelectedCountry] = useState('');
   const [countries, setCountries] = useState<string[]>([]);
-
-  useEffect(() => {
-    loadLeagues();
-  }, []);
-
-  useEffect(() => {
-    filterLeagues();
-  }, [searchTerm, selectedCountry, leagues, filterLeagues]);
-
-  const loadLeagues = async () => {
-    try {
-      setLoading(true);
-      const response = await apiFootballService.getLeagues();
-      setLeagues(response.response);
-      
-      // Extract unique countries
-      const uniqueCountries = [...new Set(response.response.map((l: League) => l.country.name))];
-      setCountries(uniqueCountries.sort());
-      
-      setFilteredLeagues(response.response);
-    } catch (err: unknown) {
-      const error = err as Error;
-      setError(error.message || 'Failed to load leagues');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const filterLeagues = useCallback(() => {
     let filtered = leagues;
@@ -80,6 +34,33 @@ export default function LeaguesPage() {
 
     setFilteredLeagues(filtered);
   }, [leagues, searchTerm, selectedCountry]);
+
+  const loadLeagues = async () => {
+    try {
+      setLoading(true);
+      const response = await apiFootballService.getLeagues();
+      setLeagues(response.response as unknown as League[]);
+      
+      // Extract unique countries
+      const uniqueCountries = [...new Set((response.response as unknown as League[]).map((l: League) => l.country.name))];
+      setCountries(uniqueCountries.sort());
+      
+      setFilteredLeagues(response.response as unknown as League[]);
+    } catch (err: unknown) {
+      const error = err as Error;
+      setError(error.message || 'Failed to load leagues');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadLeagues();
+  }, []);
+
+  useEffect(() => {
+    filterLeagues();
+  }, [searchTerm, selectedCountry, leagues, filterLeagues]);
 
   if (loading) {
     return (

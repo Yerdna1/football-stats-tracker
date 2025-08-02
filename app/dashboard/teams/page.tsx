@@ -7,27 +7,7 @@ import { Button } from '@/components/ui/button';
 import { apiFootballService } from '@/lib/api-football/service';
 import { Search, Users, MapPin, Calendar } from 'lucide-react';
 import Image from 'next/image';
-
-interface Team {
-  team: {
-    id: number;
-    name: string;
-    code: string;
-    country: string;
-    founded: number;
-    national: boolean;
-    logo: string;
-  };
-  venue: {
-    id: number;
-    name: string;
-    address: string;
-    city: string;
-    capacity: number;
-    surface: string;
-    image: string;
-  };
-}
+import { TeamResponse as Team } from '@/types/api-response';
 
 export default function TeamsPage() {
   const [teams, setTeams] = useState<Team[]>([]);
@@ -38,34 +18,6 @@ export default function TeamsPage() {
   const [selectedCountry, setSelectedCountry] = useState('');
   const [countries, setCountries] = useState<string[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
-
-  useEffect(() => {
-    filterTeams();
-  }, [searchTerm, selectedCountry, teams, filterTeams]);
-
-  const loadTeams = async (country?: string, name?: string) => {
-    try {
-      setLoading(true);
-      setError('');
-      const params: Record<string, string> = {};
-      
-      if (country) params.country = country;
-      if (name) params.search = name;
-      
-      const response = await apiFootballService.getTeams(params);
-      setTeams(response.response);
-      setHasSearched(true);
-      
-      // Extract unique countries
-      const uniqueCountries = [...new Set(response.response.map((t: Team) => t.team.country))];
-      setCountries(uniqueCountries.sort());
-    } catch (err: unknown) {
-      const error = err as Error;
-      setError(error.message || 'Failed to load teams');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const filterTeams = useCallback(() => {
     let filtered = teams;
@@ -83,6 +35,34 @@ export default function TeamsPage() {
 
     setFilteredTeams(filtered);
   }, [teams, searchTerm, selectedCountry]);
+
+  const loadTeams = async (country?: string, name?: string) => {
+    try {
+      setLoading(true);
+      setError('');
+      const params: Record<string, string> = {};
+      
+      if (country) params.country = country;
+      if (name) params.search = name;
+      
+      const response = await apiFootballService.getTeams(params);
+      setTeams(response.response as unknown as Team[]);
+      setHasSearched(true);
+      
+      // Extract unique countries
+      const uniqueCountries = [...new Set((response.response as unknown as Team[]).map((t: Team) => t.team.country))];
+      setCountries(uniqueCountries.sort());
+    } catch (err: unknown) {
+      const error = err as Error;
+      setError(error.message || 'Failed to load teams');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    filterTeams();
+  }, [searchTerm, selectedCountry, teams, filterTeams]);
 
   const handleSearch = () => {
     loadTeams(selectedCountry, searchTerm);

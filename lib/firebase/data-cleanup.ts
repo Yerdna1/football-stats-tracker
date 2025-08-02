@@ -20,7 +20,7 @@ export const cleanupUserProfile = async (userId: string) => {
       
       // Apply updates if needed
       if (Object.keys(updates).length > 0) {
-        await updateDoc(userRef, updates);
+        await updateDoc(userRef, updates as any);
         console.log(`Cleaned up user profile for ${userId}`);
         return true;
       } else {
@@ -56,7 +56,7 @@ export const recreateUserProfile = async (userId: string, email: string, display
       cleanProfile.displayName = displayName.trim();
     }
     
-    await updateDoc(userRef, cleanProfile);
+    await updateDoc(userRef, cleanProfile as any);
     console.log(`Recreated clean user profile for ${userId}`);
     return true;
   } catch (error) {

@@ -51,7 +51,7 @@ if (typeof window !== 'undefined' && app) {
 }
 
 // Initialize Analytics only in browser environment and avoid errors in static export
-if (typeof window !== 'undefined' && typeof window.gtag !== 'undefined') {
+if (typeof window !== 'undefined' && typeof (window as any).gtag !== 'undefined') {
   try {
     analytics = getAnalytics(app);
   } catch (error) {

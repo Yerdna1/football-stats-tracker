@@ -5,77 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { apiFootballService } from '@/lib/api-football/service';
+import { FixtureResponse as Fixture } from '@/types/api-response';
 import { Calendar, Clock, MapPin, Trophy } from 'lucide-react';
 import Image from 'next/image';
 
-interface Fixture {
-  fixture: {
-    id: number;
-    referee: string;
-    timezone: string;
-    date: string;
-    timestamp: number;
-    periods: {
-      first: number;
-      second: number;
-    };
-    venue: {
-      id: number;
-      name: string;
-      city: string;
-    };
-    status: {
-      long: string;
-      short: string;
-      elapsed: number;
-    };
-  };
-  league: {
-    id: number;
-    name: string;
-    country: string;
-    logo: string;
-    flag: string;
-    season: number;
-    round: string;
-  };
-  teams: {
-    home: {
-      id: number;
-      name: string;
-      logo: string;
-      winner: boolean | null;
-    };
-    away: {
-      id: number;
-      name: string;
-      logo: string;
-      winner: boolean | null;
-    };
-  };
-  goals: {
-    home: number | null;
-    away: number | null;
-  };
-  score: {
-    halftime: {
-      home: number | null;
-      away: number | null;
-    };
-    fulltime: {
-      home: number | null;
-      away: number | null;
-    };
-    extratime: {
-      home: number | null;
-      away: number | null;
-    };
-    penalty: {
-      home: number | null;
-      away: number | null;
-    };
-  };
-}
 
 export default function FixturesPage() {
   const [fixtures, setFixtures] = useState<Fixture[]>([]);
@@ -101,7 +34,7 @@ export default function FixturesPage() {
       }
       
       const response = await apiFootballService.getFixtures(params);
-      setFixtures(response.response);
+      setFixtures(response.response as unknown as Fixture[]);
     } catch (err: unknown) {
       const error = err as Error;
       setError(error.message || 'Failed to load fixtures');
