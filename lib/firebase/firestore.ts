@@ -12,6 +12,7 @@ import {
   addDoc,
   updateDoc,
   increment,
+  FieldValue,
 } from 'firebase/firestore';
 import { db } from './config';
 import { UserProfile, ApiCall, ApiResponse, UsageStats } from '@/types/firebase';
@@ -21,10 +22,10 @@ export const createUserProfile = async (userProfile: UserProfile) => {
   const userRef = doc(db, 'users', userProfile.uid);
   
   // Clean the profile data to remove undefined values
-  const cleanProfile: Partial<UserProfile> = {
+  const cleanProfile: any = {
     uid: userProfile.uid,
     email: userProfile.email,
-    createdAt: userProfile.createdAt instanceof Date ? Timestamp.fromDate(userProfile.createdAt) : userProfile.createdAt as Timestamp,
+    createdAt: userProfile.createdAt instanceof Date ? Timestamp.fromDate(userProfile.createdAt) : userProfile.createdAt,
     plan: userProfile.plan,
   };
   
@@ -127,7 +128,7 @@ export const updateUsageStats = async (apiCall: Omit<ApiCall, 'id'>) => {
   
   if (statsDoc.exists()) {
     // Update existing stats
-    const updates: Record<string, unknown> = {
+    const updates: { [key: string]: any } = {
       totalCalls: increment(1),
       [`byEndpoint.${apiCall.endpoint}`]: increment(1),
       totalResponseSize: increment(apiCall.responseSize),
@@ -137,7 +138,7 @@ export const updateUsageStats = async (apiCall: Omit<ApiCall, 'id'>) => {
       updates.errors = increment(1);
     }
     
-    await updateDoc(statsRef, updates);
+    await updateDoc(statsRef, updates as { [x: string]: FieldValue | Partial<unknown> | undefined });
     
     // Update average response time
     const currentStats = statsDoc.data() as UsageStats;
